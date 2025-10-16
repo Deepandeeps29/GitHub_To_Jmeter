@@ -24,7 +24,7 @@ jobs:
         run: |
           jmeter -n -t Login_Demo.jmx -l result.jtl -e -o reports/html
 
-      - name: Debug: List all files
+      - name: Debug
         run: |
           find . -type f
 
