@@ -19,21 +19,26 @@ jobs:
         uses: QAInsights/PerfAction@v5.6.3
         with:
           test-plan-path: './Login_Demo.jmx'
-          results-file: './result.jtl'        # ✅ add ./ to save in repo workspace
-          args: '-e -o ./reports/html'        # ✅ save dashboard inside repo workspace
+          results-file: './result.jtl'
+          args: '-e -o ./reports/html'
 
-      - name: List output files for debugging
-        run: ls -R
+      - name: List files for debugging
+        run: |
+          echo "Listing current directory:"
+          ls -al
+          echo "Listing reports/html if exists:"
+          ls -al reports/html || echo "No HTML report found"
 
       - name: Upload JMeter results
+        if: always()  # Upload even if previous steps fail
         uses: actions/upload-artifact@v4
         with:
           name: jmeter-results
-          path: ${{ github.workspace }}/result.jtl
+          path: result.jtl
 
       - name: Upload HTML Reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jmeter-html-report
-          path: ${{ github.workspace }}/reports/html
-
+          path: reports/html
