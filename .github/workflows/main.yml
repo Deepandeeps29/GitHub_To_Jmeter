@@ -15,30 +15,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run JMeter test using PerfAction
-        uses: QAInsights/PerfAction@v5.6.3
-        with:
-          test-plan-path: './Login_Demo.jmx'
-          results-file: './result.jtl'
-          args: '-e -o ./reports/html'
-
-      - name: List files for debugging
+      - name: Install JMeter
         run: |
-          echo "Listing current directory:"
-          ls -al
-          echo "Listing reports/html if exists:"
-          ls -al reports/html || echo "No HTML report found"
+          sudo apt-get update
+          sudo apt-get install -y jmeter
 
-      - name: Upload JMeter results
-        if: always()  # Upload even if previous steps fail
+      - name: Run JMeter test
+        run: |
+          jmeter -n -t Login_Demo.jmx -l result.jtl -e -o reports/html
+
+      - name: Debug: List all files
+        run: |
+          find . -type f
+
+      - name: Upload JTL file
         uses: actions/upload-artifact@v4
         with:
-          name: jmeter-results
+          name: result-jtl
           path: result.jtl
 
-      - name: Upload HTML Reports
-        if: always()
+      - name: Upload HTML Report
         uses: actions/upload-artifact@v4
         with:
-          name: jmeter-html-report
+          name: html-report
           path: reports/html
