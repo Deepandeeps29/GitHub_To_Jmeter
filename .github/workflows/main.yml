@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run JMeter test using PerfAction
+        uses: QAInsights/PerfAction@v5.6.3
+        with:
+          test-plan-path: './Login_Demo.jmx'
+          results-file: './result.jtl'        # ✅ add ./ to save in repo workspace
+          args: '-e -o ./reports/html'        # ✅ save dashboard inside repo workspace
+
+      - name: List output files for debugging
+        run: ls -R
+
+      - name: Upload JMeter results
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-results
+          path: ${{ github.workspace }}/result.jtl
+
+      - name: Upload HTML Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-html-report
+          path: ${{ github.workspace }}/reports/html
+
